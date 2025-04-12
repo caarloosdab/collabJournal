@@ -1,0 +1,20 @@
+{
+  "name": "collabjournal",
+  "version": "1.0.0",
+  "description": "productivity and journaling app for teams or individuals.",
+  "homepage": "https://github.com/caarloosdab/collabJournal#readme",
+  "bugs": {
+    "url": "https://github.com/caarloosdab/collabJournal/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caarloosdab/collabJournal.git"
+  },
+  "license": "ISC",
+  "author": "Carlos De Avila",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
