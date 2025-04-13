@@ -11,7 +11,7 @@ const MongoStore = require('connect-mongo');
 
 
 const port = process.env.PORT || 3000;
-const app = express();
+const app = require('./app');
 
 app
     .use(bodyParser.json())

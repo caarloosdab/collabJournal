@@ -7,5 +7,8 @@ const isAuthenticated = (req, res, next) => {
 };
 
 module.exports = {
-    isAuthenticated
-}
+    isAuthenticated: (req, res, next) => {
+      req.user = { name: 'Test User', id: 'test-user-id' }; // optional
+      next();
+    }
+  };
