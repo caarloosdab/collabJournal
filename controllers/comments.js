@@ -1,5 +1,7 @@
+const { body, validationResult } = require('express-validator');
 const mongodb = require('../data/database');
 const ObjectId = require('mongodb').ObjectId;
+
 
 const getAll = async (req, res) => {
   try {
@@ -11,6 +13,7 @@ const getAll = async (req, res) => {
   }
 };
 
+
 const getSingle = async (req, res) => {
   try {
     const commentId = new ObjectId(req.params.id);
@@ -18,7 +21,7 @@ const getSingle = async (req, res) => {
     if (comment) {
       res.status(200).json(comment);
     } else {
-      res.status(404).json({ message: 'comment not found' });
+      res.status(404).json({ message: 'Comment not found' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving comment', error });
@@ -26,6 +29,11 @@ const getSingle = async (req, res) => {
 };
 
 const createcomment = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const comment = {
     commentId: req.body.commentId,
     userId: req.body.userId,
@@ -42,6 +50,11 @@ const createcomment = async (req, res) => {
 };
 
 const updatecomment = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const commentId = new ObjectId(req.params.id);
   const updatedcomment = {
     commentId: req.body.commentId,
@@ -77,10 +90,19 @@ const deletecomment = async (req, res) => {
   }
 };
 
+
+  const validateComment = [
+    body('commentId').notEmpty().withMessage('commentId is required'),
+    body('userId').notEmpty().withMessage('userId is required'),
+    body('text').isLength({ min: 1 }).withMessage('Text is required and cannot be empty')
+  ];
+
 module.exports = {
   getAll,
   getSingle,
   createcomment,
   updatecomment,
-  deletecomment
+  deletecomment,
+  validateComment
 };
+

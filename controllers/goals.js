@@ -1,5 +1,6 @@
 const mongodb = require('../data/database');
 const ObjectId = require('mongodb').ObjectId;
+const { body, validationResult } = require('express-validator');
 
 const getAll = async (req, res) => {
     //#swagger.tags=['goals']
@@ -28,7 +29,12 @@ const getSingle = async (req, res) => {
     }
 };
 
-const creategoal = async (req, res) => { 
+const creategoal = async (req, res) => {
+    //#swagger.tags=['goals']
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     //#swagger.tags=['goals']
     try {
         const goal = {
@@ -52,6 +58,11 @@ const creategoal = async (req, res) => {
 };
 
 const updategoal = async (req, res) => {
+    //#swagger.tags=['goals']
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     //#swagger.tags=['goals']
     try {
         const goalId = new ObjectId(req.params.id);
@@ -90,10 +101,32 @@ const deletegoal = async (req, res) => {
     }
 };
 
+const validateGoal = [
+    body('userId')
+        .notEmpty().withMessage('userId is required')
+        .isString().withMessage('userId must be a string'),
+    body('title')
+        .notEmpty().withMessage('Title is required')
+        .isLength({ min: 3 }).withMessage('Title must be at least 3 characters'),
+    body('description')
+        .notEmpty().withMessage('Description is required')
+        .isLength({ min: 5 }).withMessage('Description must be at least 5 characters'),
+    body('status')
+        .notEmpty().withMessage('Status is required')
+        .isIn(['pending', 'in progress', 'completed']).withMessage('Invalid status'),
+    body('dueDate')
+        .notEmpty().withMessage('Due date is required')
+        .isISO8601().toDate().withMessage('Due date must be a valid date'),
+    body('priority')
+        .notEmpty().withMessage('Priority is required')
+        .isIn(['low', 'medium', 'high']).withMessage('Priority must be low, medium, or high')
+];
+
 module.exports = {
     getAll,
     getSingle,
     creategoal,
     updategoal,
-    deletegoal
-};
+    deletegoal,
+    validateGoal
+}

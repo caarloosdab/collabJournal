@@ -1,3 +1,4 @@
+const { body, validationResult } = require('express-validator');
 const mongodb = require('../data/database');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -26,6 +27,10 @@ const getSingle = async (req, res) => {
 };
 
 const createEntry = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   const entry = {
     userId: req.body.userId,
     title: req.body.title,
@@ -44,6 +49,10 @@ const createEntry = async (req, res) => {
 };
 
 const updateEntry = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   const entryId = new ObjectId(req.params.id);
   const updatedEntry = {
     userId: req.body.userId,
@@ -81,10 +90,37 @@ const deleteEntry = async (req, res) => {
   }
 };
 
+const validateEntry = [
+  body('userId')
+    .notEmpty()
+    .withMessage('userId is required')
+    .isString()
+    .withMessage('userId must be a string'),
+  body('title')
+    .notEmpty()
+    .withMessage('Title is required')
+    .isLength({ min: 3 })
+    .withMessage('Title must be at least 3 characters long'),
+  body('content')
+    .notEmpty()
+    .withMessage('Content is required')
+    .isLength({ min: 5 })
+    .withMessage('Content must be at least 5 characters long'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('mood')
+    .optional()
+    .isString()
+    .withMessage('Mood must be a string')
+];
+
 module.exports = {
   getAll,
   getSingle,
   createEntry,
   updateEntry,
-  deleteEntry
+  deleteEntry,
+  validateEntry
 };
